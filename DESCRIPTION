@@ -1,0 +1,15 @@
+Package: representative-days
+Title: Representative days using PCA and hierarchical clustering
+Version: 1.0
+Authors@R: person("Martin", "Densing", email = "martin.densing@psi.ch",
+  role = c("aut", "cre"))
+Description: Generates representative days for each season for a single region or across different regions. Methods are Principal Component Analysis (PCA) and for comparison also hierarchical clustering
+Depends: R (>= 3.1.0)
+Imports:
+        corrplot,
+        copula,
+	fitdistrplus,
+	spatstat,
+	xts
+URL: https://gitlab.psi.ch/energy-economics-group/representative-days
+License: BSD 
