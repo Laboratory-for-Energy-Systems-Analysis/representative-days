@@ -35,8 +35,9 @@ l.wide24 = x.24wide(x, yr='2017/2019')
 # l.wide24 is a list over seasons. List elements: data-frame of realizations in a wide format: Hours of days are in columns
 
 # List over seasons of stacked data of all countries for external use (e.g. other clustering):
+
 l.All = l.stacked.All(x)
-# for (s in seasNames) write.csv(l.All[[s]], paste0("SolarWindAvlCountry_",s,".csv")) # HERE IS STILL AN ERROR
+for (s in seasNames) write.csv(l.All[[s]], paste0("SolarWindAvlCountry_",s,".csv"))
 
 contour.wide24(l.wide24, "DE", "SU", "2017-2019")
 contour.wide24(l.wide24
@@ -67,20 +68,24 @@ write.csv(scnAll, "clustAllCty.csv")
 
 
 
-### PCA factor model
+### Generae senarios with PCA factor model
 
 
 
-## Generate scenarios with single PCA
+## PCA for country and season
 fac.pcaloads = PCAfac(l.wide24, "DE","SU")
 fac.pcaloads = PCAfac(l.wide24, "IT","SU")
 fac.pcaloads = PCAfac(l.wide24, "DE|IT","SU")
 fac.pcaloads = PCAfac(l.wide24, "DE","WI|SP|SU|FA")
-fac = fac.pcaloads[[1]]
-pcaloads = fac.pcaloads[[2]]
-m.sw =  fac.pcaloads[[3]]
+
+fac = fac.pcaloads[["fac"]] # series of factor model of PCA
+pcaloads = fac.pcaloads[["pcaloads"]] # Loadings of PCA
+m.sw =  fac.pcaloads[["m.sw"]]  # shift from de-meaning
+
+# Fit the distributions of the factors:
 fitParam = facAnalysis(fac)
 
+## Generate scenarios for the country and season
 scnData = scn.PCAfac(fitParam, pcaloads, m.sw)
 plotScnData(scnData, "DE", "SU")
 
@@ -98,14 +103,16 @@ plotScn(scnAll, "DE", "SU")
 
 
 
+### Quality check of scenarios:
 
-## Error in Correlations:
 
+
+## Differences in correlations:
 
 
 cov.H = plotCor.Emp(l.wide24, "DE", "SU") # plot empirical correlations
 # generate cluster scenarios and plot correlation
-cov.C = plotCor.genClust(l.wide24, "DE", "SU", n=18) 
+cov.C = plotCor.genClust(l.wide24, "DE", "SU", n=20) 
 # generate PCA scenarios and plot correlations
 cov.P = plotCor.genPCA(l.wide24,"DE","WI",J = c(2,2,1,0), textArg = "Scenarios")
 
@@ -128,31 +135,28 @@ diffcorr.C = cov2cor(cov.H) - cov2cor(cov.C) # weighted.corr$cor
 diffcorr.P[is.na(diffcorr.P)]=0
 diffcorr.C[is.na(diffcorr.C)]=0
 windows()
-lbl = paste0(cty, ", ", s, ", Difference PCA")
-contour.plot(diffcorr.P[1:24,25:48], lbl, cty, s, triang=F, oldVer=F)
+lbl = paste0("DE", ", ", "SU", ", Difference PCA")
+contour.plot(diffcorr.P[1:24,25:48], lbl, "DE", "SU", triang=F, oldVer=F)
 #dev.print(pdf, paste0("corDiffPCAContour_",cty,"_",s,"_rev1.pdf"))
 windows()
-lbl = paste0(cty, ", ", s, ", Difference Clustering")
+lbl = paste0("DE", ", ", "SU", ", Difference Clustering")
 contour.plot(diffcorr.C[1:24,25:48], lbl, cty, s, triang=F, oldVer=F)
 #dev.print(pdf, paste0("corDiffClusteringContour_",cty,"_",s,"_rev1.pdf"))
 
 
 
-
-## Error in ECDF:
-
+## Differences in ECDF:
 
 
 plotECDF(scnAll, "DE", "SU") # for summer only
-plotECDF(scnAll, "DE") # for all seasons # HERE IS STILL AN ERROR
-# plot sensitivity:
-plotECDF(scnAllComp, "DE", comparePCA = TRUE,
+plotECDF(scnAll, "DE") # for all seasons
+# Plot sensitivity (works for single country and season only):
+plotECDF(scnAllComp, "DE", "SU", comparePCA = TRUE,
          J.cases = list(c(5,0), c(5,2,0), c(5,2,1)))
-# HERE IS STILL AN ERROR
 
 
-## Error in availabilities (analysis for region DE):
 
+## Differences in availabilities (analysis is for region DE only):
 
 
 scnBEM = scnAll[["DE"]]
@@ -166,14 +170,14 @@ diff.avl(avlPCA, avlEmp) #difference for DE  (hard-coded)
 corScn = cov.wt(scnBEM[,c("windAvl", "solarAvl")],
                 wt = scnBEM[,"prob"] , cor = TRUE)
 corScn$cor
-cor(x['2017/2019'])[paste0(cty,"wind"),paste0(cty,"solar")]
-
+cor(x['2017/2019'])[paste0("DE","wind"),paste0("DE","solar")]
 
 
 
 
 
 ### Cross-regional scenarios using Copulas
+
 
 
 
@@ -231,6 +235,10 @@ xNorm = x.normalize(xAbs, 2017:2019, "SolarWindcapacity.csv", load = TRUE)
 x.plot(xNorm,"CH","2017") 
 
 
+cor(x)
+x.cor(x) # Correlations for each year separately
+
+
 # Only available if load was imported before:
 plot24(x, "ATload")
 plot24(x, "DEload")
@@ -238,7 +246,14 @@ plot24(x, "CHload")
 plot24(x, "FRload")
 plot24(x, "ITload")
 
+x = sel.wind(xAvl, "DE", windType = 3) # 3 is total wind (on- and offshore)
+colnames(x)
 
+l.wide24 = x.24wide(x, yr='2017/2019')
+
+contour.wide24(l.wide24, "DE", "SU", "2017-2019")
+
+fac.pcaloads = PCAfac(l.wide24, "DE","SU")
 
 
 

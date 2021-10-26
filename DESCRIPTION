@@ -13,3 +13,4 @@ Imports:
 	xts
 URL: https://gitlab.psi.ch/energy-economics-group/representative-days
 License: BSD 
+RoxygenNote: 7.1.1

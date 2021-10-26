@@ -1,7 +1,7 @@
 
 #' representative-days: A package for computating representative days
 #'
-#' Package for article \emph{Low-dimensional scenario generation method of solar and wind availability for representative days in energy modeling} Applied Energy, in press \url{https://doi.org/X}
+#' Package for article \emph{Low-dimensional scenario generation method of solar and wind availability for representative days in energy modeling}, Applied Energy, in press. \url{https://doi.org/X}
 #' 
 #' The package provides different categories of functions:
 #'  
@@ -18,7 +18,7 @@
 #' \item Correlations of wind, solar, and load
 #' }
 #'
-#' @section PCA:
+#' @section PCA factor model:
 #' \itemize{
 #' \item Execute the PCA on the data vector
 #' \item Make a principal compoment factor analysis
@@ -258,7 +258,7 @@ x.read <- function(
 #' wind
 #'
 #' @param x Time series (xts class) containing hourly data with column
-#'     names "ATsolar", etc.
+#'     names "ATsolar", etc.; as returned by \code{\link{x.read}}
 #' @param fn File name of solar and wind capacities in csv format,
 #'     with rows as years (e.g. 2017), and columns as country and tech
 #'     (e.g. "ATsolar")
@@ -306,14 +306,16 @@ x.normalize <- function(x
 #' Plot wind, solar (and load, if read-in) per country and per year
 #'
 #' @param  x Time series (xts class) containing hourly data with column
-#'     names "ATsolar", etc.
+#'     names "ATsolar", etc.; as returned by \code{\link{x.normalize}} or \code{\link{x.read}} 
 #' @param cty Country
-#' @param yr Year or range of years
+#' @param yr Year (or a range of years in xts-notation)
+#'
 #' @examples
 #' \notrun{
 #' plotSolarWind(x,"CH","2017\2019")
 #' plotSolarWind(x,"CH","2018")
 #' }
+#' 
 x.plot <- function(x, cty, yr) {
     # Convert to zoo object to allow plotting of multivariate time-series
     plot.zoo(x[yr,grepl(cty, names(x))],
@@ -330,7 +332,7 @@ x.plot <- function(x, cty, yr) {
 #'
 #' 
 #' @param  x Time series (xts class) containing hourly data with column
-#'     names \ldots, "DEONwind", "DEOFFwind", "DEONOFFwind"
+#'     names \ldots, "DEONwind", "DEOFFwind", "DEONOFFwind"; as returned by \code{\link{x.normalize}} or \code{\link{x.read}} 
 #' @param windType 1: onshore, 2: offhsore, 3: total
 #' @param cty Country (default: "DE")
 #' 
@@ -367,7 +369,7 @@ sel.wind <- function (x
 #' If load is read-in: Print correlation-test of load/wind of first year
 #' 
 #' @param  x Time series (xts class) containing hourly data with column
-#'     names "ATsolar", etc.
+#'     names "ATsolar", etc.; as returned by \code{\link{sel.wind}} 
 #' @param yr List of three years
 #'
 x.cor <- function(x
@@ -418,8 +420,10 @@ x.cor <- function(x
 #'
 #' The number of seasons is currently hardcoded: 4 seasons
 #' 
-#' @param x time series in xts-format
+#' @param  x Time series (xts class) containing hourly data with column
+#'     names "ATsolar", etc.; as returned \code{\link{sel.wind}} 
 #' @param cols column to plot
+#' @param yr list of years (default: \code{c("2017","2018","2019")})
 #' @param xpd expand the dispay (required for plots of wind)
 #' 
 #' @examples
@@ -427,8 +431,11 @@ x.cor <- function(x
 #' windows(); plot24(x,"ATsolar"); dev.print(pdf, "ATsolar.pdf") 
 #' windows(); plot24(x,"ATwind", TRUE)
 #' }
-plot24 <- function(x, cols, xpd = FALSE) {
-    y = x24SeasonYears(x, cols)
+plot24 <- function(x
+                  ,cols
+                  ,yr = c("2017","2018","2019") 
+                  ,xpd = FALSE) {
+    y = x24SeasonYears(x, cols, yr)
     if (xpd) par(xpd=TRUE, mar=par()$mar+c(0,0,0,7))
     plot(y, plot.type = "single",
          col = rep(1:4, each = 3), lty = 1:3, lwd = 2, 
@@ -476,7 +483,7 @@ x24Seas <- function(z, cols, year) {
 #' Helper function to plot seasonal day-hour value
 #' 
 #' @param  x Time series (xts class) containing hourly data with column
-#'     names "ATsolar", etc.
+#'     names "ATsolar", etc.; as returned \code{\link{sel.wind}} 
 #' @param yr Years
 #' @param cols Column-names of the time series to select (e.g. "ATsolar")
 #'
@@ -560,6 +567,8 @@ dayHourPerSeason <- function(x, cty, s, load = FALSE) {
 }
 
 
+
+
 #'Prepare data for PCA
 #'
 #' Assumption: The input time series is in CET, and we convert first to UTC.
@@ -570,7 +579,7 @@ dayHourPerSeason <- function(x, cty, s, load = FALSE) {
 #'     names "ATsolar", etc.
 #' 
 #' @return 
-#' List over seasons. A list element contains data.frame of all countries in wide forma(the day hours are in different columns)
+#' List over seasons. A list element contains data.frame of all countries in wide forma (the day hours are in different columns)
 #' \itemize{
 #'  \item data.frame has 240 columns (2*24 hours (solar+wind) * 5 countries) with names: "solarCH01", "solarCH02",\ldots,"windIT24"
 #' }
@@ -602,7 +611,7 @@ x.24wide <- function(x
 
 #' Data over seasons for all countries  
 #'
-#' Used to prepare data for external use, e.g. for external clustering. 
+#' Used to prepare data for external use, e.g. for external clustering. Convert time series first to UTC to avoid duplicated hours 
 #' 
 #' @param x Time series with columns "ATsolar","ATwind",\ldots,"ITwind" (xts-class)
 #' 
@@ -611,6 +620,8 @@ x.24wide <- function(x
 #'
 l.stacked.All <- function(x)
 {
+    tzone(x) = 'UTC'
+    time(x) = time(x)+3600 # shift a day back to start in year
     y = list()
     for (s in seasNames) {
         print(s)
@@ -665,7 +676,7 @@ contour.plot <- function (correl
                          ,cty
                          ,s
                          ,triang = TRUE
-                         ,oldVer = TRUE
+                         ,oldVer = FALSE
                           )
 {
     m.r = 1
@@ -736,6 +747,7 @@ contour.plot <- function (correl
 
 #' Contour plot of correlations of data in wide format
 #'
+#' @param xSWH Data in wide format, as returned by \code{\link{x.24wide}}
 #' @param cty Country, single or multiple countries (default: \code{"DE|IT"})
 #' @param seas Season (single or multiple seasons (default: \code{c("SP","SU")})
 #' @param yrRange Used for title (default: \code{"2017-2019"))
@@ -814,7 +826,7 @@ clust.medoid <- function(i, distmat, clusters) {
 #'  \item{"single"}{Smallest distance between point-pairs of two clusters}
 #' }
 #' 
-#' @param xSWH List over seasons of data in wide format (day hours are in columns).Given a season,  a list element is a data.frame with columns "ATsolar01", "ATsolar02' etc., and rows = observations in the season
+#' @param xSWH List over seasons of data in wide format (day hours are in columns). Given a season, a list element is a data.frame with columns "ATsolar01", "ATsolar02' etc., and rows = observations in the season; as returned by \code{\link{x.24wide}}
 #' @param nclus Number of clusters
 #' @param cty Country, can be several countries (default: "DE"; "AT|CH|DE|FR|IT")
 #' @param s Season (default: "SU")
@@ -925,7 +937,7 @@ scn.clust <- function(xSWH
 #'
 #' Stack the cross-country scenarios over all the seasons. Hence, increase the scenario index, because different seasons have independent scenarios in the electrictiy market model BEM
 #' 
-#' @param xSWH List over seasons of data in wide format (day hours are in columns).Given a season,  a list element is a data.frame with columns "ATsolar01", "ATsolar02' etc., and rows = observations in the season
+#' @param xSWH List over seasons of data in wide format (day hours are in columns).Given a season,  a list element is a data.frame with columns "ATsolar01", "ATsolar02' etc., and rows = observations in the season; as returned by \code{\link{x.24wide}}
 #' @param nclust Number of clusters
 #' 
 #' @return scenarios over all countries over all seasons
@@ -952,6 +964,8 @@ scn.clust.cross <- function(xSWH
 #'
 #' A convenience function for BEM. Not required for PCA or clustering.
 #'
+#' @param xSWH Data in wide format, as returned by \code{\link{x.24wide}}
+#' 
 #' @return Data.frame of solar and wind availability for each load period and for each country
 #'  \itemize{
 #'     \item rows: 5 * 96 (countries x seasons x hours), e.g., "AT.WI-D-01"
@@ -1050,7 +1064,7 @@ discrWeibull <- function (i,pWeib) {
 #'
 #' Log-normal factors gave usually bad results. Avoid!
 #'
-#' @param xSWH List over seasons of data in wide format (day hours are in columns).Given a season, a list element is a data.frame with columns "ATsolar01", "ATsolar02' etc., and rows = observations in the season
+#' @param xSWH List over seasons of data in wide format (day hours are in columns).Given a season, a list element is a data.frame with columns "ATsolar01", "ATsolar02' etc., and rows = observations in the season; as returned by \code{\link{x.24wide}}
 #' @param cty Country
 #' @param season Season
 #' @param m Number of loadings to plot
@@ -1139,9 +1153,9 @@ PCAfac <- function(xSWH
 
     fac = as.matrix(sw) %*% pcaloads
     l = list()
-    l[[1]] = fac
-    l[[2]] = pcaloads
-    l[[3]] = m.sw
+    l[["fac"]] = fac
+    l[["pcaloads"]] = pcaloads
+    l[["m.sw"]] = m.sw
     return(l)
 }
 
@@ -1251,8 +1265,7 @@ facAnalysis <- function(fac
 
 
 
-### Scenario generation of a single PCA 
-
+### Scenario generation of PCA for selected country and season 
 
 
 
@@ -1741,7 +1754,7 @@ plotCor.genPCA <- function(xSWH
 #' Plot empirical distribution function of wind and solar.
 #' Select a season or entire year.
 #'
-#' @param scn.ws.or.comp List of scenarios over countries of type \emph{scnBEM} (see help \code{\link{scn.clust}}). If sensitivity analysis (comparison): List of single-country scenarios over the different elements of \code{J.cases}
+#' @param scn.ws.or.comp List of scenarios over countries of type \emph{scnBEM} (see help \code{\link{scn.clust}}). If sensitivity analysis (comparison): List of single-country scenarios over the different elements of \code{J.cases}. As returned by \code{\link{scn.All}}
 #' @param cty Country
 #' @param s Season (default is fully year: s=seasNames)
 #' @param yrs Used for plot title, range of years
@@ -1752,7 +1765,8 @@ plotCor.genPCA <- function(xSWH
 #' \notrun{
 #' plotEmpirical(scn.ws) # full year
 #' plotEmpirical(scn.ws, s="SU") # SU
-#' } 
+#' }
+#' 
 plotECDF <- function(scn.ws.or.comp
                     ,cty = "DE"
                     ,s = seasNames
@@ -1767,7 +1781,8 @@ plotECDF <- function(scn.ws.or.comp
                            gsub("c","",
                                 as.character(lapply(J.cases,function(x) x+1))))
     } else scnBEM = scn.ws.or.comp[[cty]]
-    
+
+    sBar = paste(s, collapse="|")
     for (tech in c("wind", "solar")) {
         windows()
         par(ps=9)
@@ -1779,7 +1794,7 @@ plotECDF <- function(scn.ws.or.comp
              cex.axis = 2,
              cex.lab = 2,
              cex.main = 2,
-             main =  paste(cty, s) 
+             main =  paste(cty, sBar) 
              )
         
         if (comparePCA) {
@@ -1793,7 +1808,7 @@ plotECDF <- function(scn.ws.or.comp
                 colCmp = colCmp + 1
             }
         } else {
-            v = scnBEM[c("prob",paste0(tech,"Avl"))][grepl(s,scnBEM$loadp),]
+            v = scnBEM[c("prob",paste0(tech,"Avl"))][grepl(sBar,scnBEM$loadp),]
             lines(ewcdf(v[,2], weights = v$prob/96),
                   col="blue",
                   lwd=3
@@ -1818,7 +1833,7 @@ plotECDF <- function(scn.ws.or.comp
                    )
             if (plot2pdf)
                 dev.print(pdf,
-                          paste0("compcdf_", tech, "_", cty, "_", s, ".pdf"))
+                          paste0("compcdf_", tech, "_", cty, "_", sBar, ".pdf"))
         }
     }   
 }
@@ -2013,21 +2028,13 @@ daily.cor.cross <- function(x
 
 
 
-
-#' Simplified daily correlation matrix of wind and solar between countries
+#' Reduce correlation matrix (remove cross-regional solar correlations)
 #'
-#' Solar is no longer country-specific
-#' 
 #' @param  x Time series (xts class) containing hourly data with column
 #'     names "ATsolar", etc.
 #' @param seas Season (seas = seasNames gives whole year)
-#'
-#' @return correlation matrix
-#'
-daily.cor.cross.simple <- function(x
-                                  ,seas = seasNames
-                                  ,plot2pdf = FALSE
-                                   )
+#' 
+reduce.cor <- function(x, seas)
 {
     x.d = x.daily(x, seas)
     reOrder = c(paste0(ctyNames,"solar"), paste0(ctyNames,"wind"))
@@ -2047,6 +2054,27 @@ daily.cor.cross.simple <- function(x
     # where solar cross-country correlation are neglected:
     c.d.small = cbind(solar = c(1, c.sw.d), rbind(solar = c.sw.d, c.w.d) )
 
+    return(c.d.small)
+}
+
+
+
+#' Simplified daily correlation matrix of wind and solar between countries
+#'
+#' Solar is no longer country-specific
+#' 
+#' @param  x Time series (xts class) containing hourly data with column
+#'     names "ATsolar", etc.
+#' @param seas Season (seas = seasNames gives whole year)
+#'
+#' @return correlation matrix
+#'
+daily.cor.cross.simple <- function(x
+                                  ,seas = seasNames
+                                  ,plot2pdf = FALSE
+                                   )
+{
+    c.d.small = reduce.cor(x, seas)
     corrplot.mixed(c.d.small, tl.col=1,lower.col = "black", tl.cex = .8)
     if (plot2pdf) dev.print(pdf,paste0("corDailySimple_",seas,".pdf"))
     return(c.d.small)
@@ -2336,25 +2364,13 @@ scn.cross.year <- function(x
 {
     scn.ws.new.year = list() # list over seasons
     for (s in seasNames) {
-        x.d = x.daily(x,s)
-        x.d.small = avg.Cols(x.d)
         #browser()
         rC = if (tCop) {
-                 fit.tC.and.sample(x.d.small, sample.size)
+                  x.d = x.daily(x, s)
+                  x.d.small = avg.Cols(x.d)
+                  fit.tC.and.sample(x.d.small, sample.size)
              } else {
-                 reOrder = c(paste0(ctyNames,"solar"), paste0(ctyNames,"wind"))
-                 c.d = cor(x.d)[reOrder,][,reOrder] 
-                 c.sw.d = c(
-                     c.d["ATwind","ATsolar"],
-                     c.d["CHwind","CHsolar"],
-                     c.d["DEwind","DEsolar"],
-                     c.d["FRwind","FRsolar"],
-                     c.d["ITwind","ITsolar"]
-                 )
-                 c.w.d = c.d[paste0(ctyNames, "wind"),
-                             paste0(ctyNames, "wind")]
-                 c.d.small = cbind(solar = c(1, c.sw.d),
-                                   rbind(solar = c.sw.d, c.w.d) )
+                 c.d.small = reduce.cor(x, s)
                  fit.nC.and.sample(c.d.small, sample.size)
              }
         scn.ws.new = scn.cross(scn.ws, s, rC, sample.size) 
