@@ -50,9 +50,10 @@
 #' }
 #' 
 #' @docType package
-#' @name reprDays
+#' @name reprDays-package
 NULL
 
+# Note that above "-package" is required that the general package documentation comes in front of the function documentation
 
 # ESS in Emacs specifics:
 #

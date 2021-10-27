@@ -1,16 +1,18 @@
 Package: reprDays
-Title: Representative days using PCA and hierarchical clustering
 Version: 1.0
-Authors@R: c(person(given = "Martin",
-                  familiy =  "Densing",
-		  email = "martin.densing@psi.ch",
-  		  role = c("aut", "cre")
-		  comment = c(ORCID = "X")),
+Title: Representative days using PCA and hierarchical clustering
+Authors@R:
+	c(person(given = "Martin",
+        	    family =  "Densing",
+		    email = "martin.densing@psi.ch",
+  		    role = c("aut", "cre"),
+		    comment = c(ORCID = "X")),
               person(given = "Yi",  
-                   family = "Wan",
-                   role = c("aut"),
-                   email = "yi.wan@psi.ch",
-                   comment = c(ORCID = "X")))
+                     family = "Wan",
+                     role = "ctb",
+                     email = "yi.wan@psi.ch",
+                     comment = c(ORCID = "X"))
+		     )
 Description: Generates representative days for each season for a single region or across different regions. Methods are Principal Component Analysis (PCA) and for comparison also hierarchical clustering
 Depends: R (>= 3.1.0)
 Imports:

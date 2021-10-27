@@ -3,9 +3,9 @@
 ### Read data and plot
 
 set.cty.seas()
-# We assume that the working directory is in folder "../inst" relative to "R/Data/"
-xAbs = x.read(fn.path = "../R/Data/", 2017:2019)
-xAvl = x.normalize(xAbs, 2017:2019, "../R/SolarWindcapacity.csv")
+# Under the assumptiont that the working directory is in folder of script file, and the data is in the subfolder "extdata":
+xAbs = x.read(fn.path = "extdata/", 2017:2019)
+xAvl = x.normalize(xAbs, 2017:2019, "extdata/SolarWindcapacity.csv")
 
 # plot time series of wind (DE: off-, onshore), solar, and optionally load
 x.plot(xAvl,"CH","2017") 
