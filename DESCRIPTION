@@ -1,4 +1,4 @@
-Package: representative-days
+Package: reprDays
 Title: Representative days using PCA and hierarchical clustering
 Version: 1.0
 Authors@R: person("Martin", "Densing", email = "martin.densing@psi.ch",

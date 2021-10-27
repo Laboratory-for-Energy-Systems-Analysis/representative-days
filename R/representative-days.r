@@ -1,5 +1,5 @@
 
-#' representative-days: A package for computating representative days
+#' reprDays: A package for computating representative days
 #'
 #' Package for article \emph{Low-dimensional scenario generation method of solar and wind availability for representative days in energy modeling}, Applied Energy, in press. \url{https://doi.org/X}
 #' 
@@ -35,8 +35,7 @@
 #' Generate representative days by clustering. Given a season, single and cross-regional scenarios can be generated
 #'
 #'
-#' @section Cross-regional scenarios
-#' 
+#' @section Cross-regional scenarios:
 #' \itemize{
 #' \item Analysis of daily wind and solar correlations across regions (countries)
 #' \item Estimation of joint extreme solar and wind availabilities
@@ -51,7 +50,7 @@
 #' }
 #' 
 #' @docType package
-#' @name representative-days
+#' @name reprDays
 NULL
 
 
@@ -96,8 +95,8 @@ library(copula)       # for cross-regional analysis
 #' \describe{
 #'  \item{\code{ctyNames}}{\code{c("AT", "CH", "DE", "FR", "IT")}}
 #'  \item{\code{seasNames}}{\code{c("WI", "SP", "SU", "FA")}}
-#'     \item{\code{seasons}}{Matrix: columns =
-#'     "WI, "SP", "SU", "FA"; rows = month-index in {1,\ldots,12}
+#'  \item{\code{seasons}}{Matrix: columns =
+#'     "WI, "SP", "SU", "FA"; rows = month-index (1,\ldots,12)}
 #' }
 set.cty.seas <- function(cty = c("AT", "CH", "DE", "FR", "IT")
                         ,seas =  c("WI", "SP", "SU", "FA")
@@ -311,7 +310,7 @@ x.normalize <- function(x
 #' @param yr Year (or a range of years in xts-notation)
 #'
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' plotSolarWind(x,"CH","2017\2019")
 #' plotSolarWind(x,"CH","2018")
 #' }
@@ -427,7 +426,7 @@ x.cor <- function(x
 #' @param xpd expand the dispay (required for plots of wind)
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' windows(); plot24(x,"ATsolar"); dev.print(pdf, "ATsolar.pdf") 
 #' windows(); plot24(x,"ATwind", TRUE)
 #' }
@@ -543,7 +542,7 @@ x24SeasonYears <- function(x
 #'}
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' dayHourPerSeason("AT",3)
 #' dayHourPerSeason("DE", 4:9) # summer halfyear
 #' dayHourPerSeason("DE", c(1,2,3,10,11,12)) # winter halfyear
@@ -669,7 +668,7 @@ daysPerSeason <- function(x, cty, seas)
 #' @param oldVer Plot old version with other color codes, whereas new version  asfixed levels? (default: TRUE)
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' }
 contour.plot <- function (correl
                          ,title.cont
@@ -750,13 +749,13 @@ contour.plot <- function (correl
 #' @param xSWH Data in wide format, as returned by \code{\link{x.24wide}}
 #' @param cty Country, single or multiple countries (default: \code{"DE|IT"})
 #' @param seas Season (single or multiple seasons (default: \code{c("SP","SU")})
-#' @param yrRange Used for title (default: \code{"2017-2019"))
+#' @param yrRange Used in title of plot (default: \code{"2017-2019"})
 #' @param subrange Plot only correlation between solar and wind (and not e.g. between hours of solar)? (default: FALSE)
 #' @param upper.triangle Plot only upper triangle? (default: TRUE)
 #' @param old.version Plot old version with other color codes, whereas new version  asfixed levels? (default: TRUE)
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' contour.wide24(l.wide24, "DE", "SU", "2017-2019") 
 #' }
 #' 
@@ -819,31 +818,43 @@ clust.medoid <- function(i, distmat, clusters) {
 #' The agglomerative, hierarchical clustering uses a \code{method}, which is a
 #' dissimilarity measure between clusters (so-called Linkage):
 #' \describe{
-#'  \item{"ward.D2" (default)}{Ward's method. Minimizes variance of (potentially) merged clusters
-#'    (ward "likes" to produce clusters of equal sizes; "ward.D" was coded wrongly)}
-#'  \item{"average"}{(= UPGMA): average distance between all points of two clusters}
-#'  \item{"complete"}{Highest distance between point-pairs of two clusters}
-#'  \item{"single"}{Smallest distance between point-pairs of two clusters}
+#'    \item{\code{"ward.D2"} (default)}{Ward's method.
+#'        Minimizes variance of (potentially) merged clusters
+#'        (ward "likes" to produce clusters of equal sizes;
+#'         "ward.D" was coded wrongly)}
+#'  \item{\code{"average"}}{(= UPGMA):
+#'             average distance between all points of two clusters}
+#'  \item{\code{"complete"}}{Highest distance between point-pairs
+#'            of two clusters}
+#'  \item{\code{"single"}}{Smallest distance between
+#'                 point-pairs of two clusters}
 #' }
 #' 
-#' @param xSWH List over seasons of data in wide format (day hours are in columns). Given a season, a list element is a data.frame with columns "ATsolar01", "ATsolar02' etc., and rows = observations in the season; as returned by \code{\link{x.24wide}}
+#' 
+#' @param xSWH List over seasons of data in wide format (day hours are
+#'     in columns). Given a season, a list element is a data.frame
+#'     with columns "ATsolar01",
+#'     "ATsolar02' etc., and rows = observations in the season; as returned by \code{\link{x.24wide}}
 #' @param nclus Number of clusters
-#' @param cty Country, can be several countries (default: "DE"; "AT|CH|DE|FR|IT")
-#' @param s Season (default: "SU")
+#' @param cty Country (default: \code{"DE"}; several countries \code{"AT|CH|DE|FR|IT"})
+#' @param s Season (default: \code{"SU"})
 #' @param interactive Plot detailed diagonstic of clustering (dendogramm etc.)? (default: FALSE)
 #' @param crossCountry Cluster across countries (\code{cty} must have several regions)? (default: FALSE)
 #' @param clustmethod Cluster method, that is, the linkage (default: Ward's method)
-#' @param distmeasure Measure of distance between data points (default: "euclidean"). Other possible distances are e.g. "maximum" and "manhattan" 
+#' @param distmeasure Measure of distance between data points (default: \code{"euclidean"}).  Other possible distances are e.g. "maximum" and "manhattan"
 #'
 #' @return
-#' For a single region, a data.frame (called \emph{scnBEM}) of scenarios in stacked format is returned (i.e. the 24 day hours of scenario values are in rows):
-#' \tabular{cccrrr}
-#' \strong{scn} \par \strong{country} \par \strong{loadp} \par \strong{prob} \par \strong{windAvl} \par \strong{solarAvl} \cr
-#' "o1" \par "AT" \par "WI-D-01" \par 0.01 \par 0.3    \par  0.0    \cr 
-#' "o1" \par "AT" \par "WI-D-02" \par 0.01 \par 0.3    \par  0.0    \cr
-#' "o1" \par "AT" \par \ldots    \par 0.01 \par \ldots \par  \ldots \cr
-#' "o1" \par "AT" \par "WI-D-24" \par 0.01 \par 0.3    \par  0.1    \cr
-#' "o2" \par "AT" \par "WI-D-01" \par 0.02 \par 0.3    \par  0.0
+#' For a single region, a data.frame (called \emph{scnBEM}) of scenarios
+#' in stacked format is returned (i.e. the 24 day hours of scenario
+#' values are in rows):
+#' \tabular{cccrrr}{
+#' \strong{scn} \tab \strong{country} \tab \strong{loadp} \tab
+#'           \strong{prob} \tab \strong{windAvl} \tab \strong{solarAvl} \cr
+#' "o1" \tab "AT" \tab "WI-D-01" \tab 0.01 \tab 0.3    \tab  0.0    \cr 
+#' "o1" \tab "AT" \tab "WI-D-02" \tab 0.01 \tab 0.3    \tab  0.0    \cr
+#' "o1" \tab "AT" \tab \ldots    \tab 0.01 \tab \ldots \tab  \ldots \cr
+#' "o1" \tab "AT" \tab "WI-D-24" \tab 0.01 \tab 0.3    \tab  0.1    \cr
+#' "o2" \tab "AT" \tab "WI-D-01" \tab 0.02 \tab 0.3    \tab  0.0
 #' }
 #' For multiple regions, a list over the countries is returned, where each list element is data.frame of format \emph{scnBEM}
 #'
@@ -1018,7 +1029,7 @@ agggregate.avl.BEM <- function(xSWH)
 #' \enumerate{
 #'  \item Shape and scale parameters of fitted Weibull distribution
 #'  \item Sign reversion and shift (applied before fitting)
-#' 
+#'} 
 fitWeibull <- function (data) {
     signF1 = if(sum(data)<0) -1 else 1
     fac1.mod = signF1*data
@@ -1075,7 +1086,7 @@ discrWeibull <- function (i,pWeib) {
 #' @return list: 1. Factors implied by PCA over the input data points (rows), that is, a daily time series of factors (class: matrix); 2. pcaloads
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' PCAsingle("DE|IT","SU")
 #' PCAsingle("AT","SU")
 #' PCAsingle("DE","WI|SP|SU|FA")
@@ -1448,7 +1459,7 @@ plotScnData <- function(scnData, cty, season, plot2pdf = FALSE) {
 #' @return List of scenarios over countries of type \emph{scnBEM} (see help \code{\link{scn.clust}}). If sensitivity analysis: List of single-country scenarios over the different elements of \code{J.cases}
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' scn.All(J.cases = list(c(5,2,1)))
 #' scn.All(J.cases = list(c(5,0), c(5,2,0), c(5,2,1)))
 #' }
@@ -1762,7 +1773,7 @@ plotCor.genPCA <- function(xSWH
 #' @param J.cases Parameters of sensitivity analysis, used in title of plot
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' plotEmpirical(scn.ws) # full year
 #' plotEmpirical(scn.ws, s="SU") # SU
 #' }
@@ -2002,7 +2013,7 @@ x.daily <- function(x,seas) {
 #' @return correlation matrix
 #' 
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' daily.cor.cross(x.d, "SU")
 #' daily.cor.cross(x.d, seasNames)
 #' }
@@ -2100,7 +2111,7 @@ daily.cor.cross.simple <- function(x
 #' @param x An xts-time series (for the paper, this is a daily time-series, usually denoted by x.d)
 #'
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' lambda.non.param(x.d)
 #' }
 lambda.nonpar <- function(x) {
@@ -2121,7 +2132,7 @@ lambda.nonpar <- function(x) {
 #' @param x An xts-time series (for the paper, this is a daily time-series, usually denoted by x.d)
 #'
 #' @examples
-#' \notrun{
+#' \dontrun{
 #' lambda.t(x.d)
 #' }
 lambda.t <- function(x) {
@@ -2391,7 +2402,7 @@ scn.cross.year <- function(x
 #' @param tag String appended to file name
 #'
 #' @examples
-#' \norun{
+#' \dontrun{
 #' scn.cross.write(scn.ws.new.year, 20, "_tcopula")
 #' }
 scn.cross.write <- function(scn.ws.new.year
