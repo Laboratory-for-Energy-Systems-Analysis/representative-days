@@ -6,12 +6,11 @@ Authors@R:
         	    family =  "Densing",
 		    email = "martin.densing@psi.ch",
   		    role = c("aut", "cre"),
-		    comment = c(ORCID = "X")),
+		    comment = c(ORCID = "0000-0003-4477-1299")),
               person(given = "Yi",  
                      family = "Wan",
-                     role = "ctb",
-                     email = "yi.wan@psi.ch",
-                     comment = c(ORCID = "X"))
+                     role = "aut",
+                     email = "yi.wan@psi.ch")
 		     )
 Description: Generates representative days for each season for a single region or across different regions. Methods are Principal Component Analysis (PCA) and for comparison also hierarchical clustering
 Depends: R (>= 3.1.0)

@@ -1,6 +1,10 @@
-# Package Representative days
+# R-package Representative Days (ReprDays)
 
-R-functions and corresponding script file `script.r` for interactive use for journal article *Low-dimensional scenario generation method of solar and wind availability for representative days in energy modeling*, Applied Energy, in press. https://doi.org/X
+R-functions and corresponding script file `script.r` for interactive use, and data files.
+
+Software companion for journal article:
+
+**Martin Densing, Yi Wan (2021).** Low-dimensional scenario generation method of solar and wind availability for representative days in energy modeling, *Applied Energy*, in press. https://doi.org/10.1016/j.apenergy.2021.118075
 
 
 ## Documentation of package
@@ -23,3 +27,6 @@ The files are arranged in the folder structure of an R package, which allows to 
 	   3. `build(manual = T)` # builds the zipped R package, including the documentation
 	   4. After installing the package in R, the path to the external CSV-files can be queried in R with `system.file("extdata", package = "reprDays")`, which gives also the path to `script.r`, which then can be interactively opened and executed.
 
+## Data
+
+Generation and load data is from the transparency platform of ENTSO-E (https://transparency.entsoe.eu/); data can be used freely if the platform is cited.

@@ -1,7 +1,10 @@
 
 #' reprDays: A package for computating representative days
 #'
-#' Package for article \emph{Low-dimensional scenario generation method of solar and wind availability for representative days in energy modeling}, Applied Energy, in press. \url{https://doi.org/X}
+#' Software companion for journal article \bold{Martin Densing, Yi Wan (2021).}
+#' Low-dimensional scenario generation method of solar and wind availability
+#' for representative days in energy modeling, \emph{Applied Energy}, in press.
+#' \url{https://doi.org/10.1016/j.apenergy.2021.118075}
 #' 
 #' The package provides different categories of functions:
 #'  
