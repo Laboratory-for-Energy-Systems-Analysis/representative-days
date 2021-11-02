@@ -145,7 +145,25 @@ load.24 <- function(seas, n=24) paste0(seas,"-D-",sprintf("%02d", 1:n))
 
 
 
-
+#' Converts a CET time series to UTC
+#'
+#' @param x XTS time series
+#'
+#'
+#' @return time series with time-zone UTC 
+#' 
+CET2UTC <- function(x)
+{
+    cat("Original time zone:")
+    print(tzone(x))
+    tzone(x) = 'UTC'
+    time(x) = time(x)+3600 # shift a day back to start in year
+    print("Data at first date:");
+    print(first(x))
+    print("Data at last date:");
+    print(last(x)) # Checks
+    return(x)
+}
 
 
 
@@ -590,12 +608,7 @@ dayHourPerSeason <- function(x, cty, s, load = FALSE) {
 x.24wide <- function(x
                     ,yr = '2017/2019')
 {
-    cat("time zone:"); print(tzone(x))
-    x = x[yr]
-    tzone(x) = 'UTC'
-    time(x) = time(x)+3600 # shift a day back to start in year
-    print("Data at first date:"); print(first(x))
-    print("Data at last date:"); print(last(x)) # Checks
+    x = CET2UTC(x[yr])
 
     xSWH = list() #  list over seasons
     for (s in seasNames) {
@@ -1992,12 +2005,17 @@ diff.avl <- function(avlPCA
 
 #' Daily mean per season
 #'
+#' Conver first to UTC time zone
+#' 
 #' @param x xts-object 
 #' @param seas Season. Season can be whole year (s = seasNames) 
 #'
-x.daily <- function(x,seas) {
-    z = x[(month(x) %in% seasons[,seas]),]
-    return(apply.daily(z, mean))
+x.daily <- function(x, seas)
+{
+    z = CET2UTC(x)
+    z = z[(month(z) %in% seasons[,seas]),]
+    z = apply.daily(z, mean)
+    return(z)
 }
 
 
@@ -2198,11 +2216,12 @@ avg.Cols <-  function(x
 #'
 fit.tC.and.sample <- function (x.d.small
                               ,sample.size = 20
+                              ##,start.fit = c(0,0,0,46)
                                )
 {
     tc.ml = fitCopula(tCopula(dim=6, dispstr="un")
                      ,as.matrix(x.d.small), method="ml"
-                      #,start = c(0,0,0,46)
+                     #,start = start.fit
                       )
     # returns dispersion matrix P = Sigma = neq correlation 
     print(summary(tc.ml))

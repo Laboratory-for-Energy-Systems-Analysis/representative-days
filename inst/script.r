@@ -185,17 +185,19 @@ cor(x['2017/2019'])[paste0("DE","wind"),paste0("DE","solar")]
 c.d = daily.cor.cross(x,"SU")  # summer season
 c.d.all = daily.cor.cross(x)  # all seasons
 c.d.small = daily.cor.cross.simple(x,"FA")
+d
 
-# Lambda
+
 x.d = x.daily(x,"FA") # get daily time series from hourly
+
+# Joint extreme values: Lambda
 lambda.nonpar(x.d)
 lambda.t(x.d) # counterfactual
-
 
 #Consider only an averaged solar column:
 x.d.small = avg.Cols(x.d)
 
-# t-copula
+# t-copula (ERRORS, except for FA)
 rtC = fit.tC.and.sample(x.d.small, sample.size = 20)
 plot(rtC)
 
